@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import path from "path";
 import { HttpError } from "./errors/http-error";
 
+import authRoutes from "./routes/auth.routes";
+
 dotenv.config();
 
 console.log(process.env.PORT);
@@ -13,6 +15,8 @@ const app: Application = express();
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.use(bodyParser.json());
+
+app.use("/api/auth", authRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to API World!");
