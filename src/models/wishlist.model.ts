@@ -23,7 +23,6 @@ const WishlistSchema: Schema = new Schema<WishlistType>(
       type: String,
       maxlength: 500,
     },
-    //
   },
   {
     timestamps: true,
