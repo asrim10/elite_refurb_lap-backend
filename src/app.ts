@@ -6,6 +6,7 @@ import { HttpError } from "./errors/http-error";
 
 import authRoutes from "./routes/auth.routes";
 import laptopRoutes from "./routes/laptop.routes";
+import wishlistRoutes from "./routes/wishlist.routes";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(bodyParser.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/laptop", laptopRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to API World!");
