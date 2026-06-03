@@ -71,7 +71,7 @@ export class WishlistController {
 
   async getPublicWishlist(req: Request, res: Response) {
     try {
-      const { userId } = req.params;
+      const userId = req.params.userId as string;
 
       const wishlist = await wishlistService.getPublicWishlist(userId);
       return res.status(200).json({
@@ -243,7 +243,7 @@ export class WishlistController {
           .json({ success: false, message: "Unauthorized" });
       }
 
-      const { laptopId } = req.params;
+      const laptopId = req.params.laptopId as string;
 
       const isInWishlist = await wishlistService.checkIfLaptopInWishlist(
         userId,

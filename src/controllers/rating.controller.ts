@@ -43,7 +43,7 @@ export class RatingController {
 
   async getById(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const id = req.params.id as string;
       const rating = await ratingService.getRatingById(id);
       return res.status(200).json({
         success: true,
@@ -59,7 +59,7 @@ export class RatingController {
 
   async getSellerRatings(req: Request, res: Response) {
     try {
-      const { sellerId } = req.params;
+      const sellerId = req.params.sellerId as string;
       const result = await ratingService.getSellerRatings(sellerId);
       return res.status(200).json({
         success: true,
@@ -105,7 +105,7 @@ export class RatingController {
           .json({ success: false, message: "Unauthorized" });
       }
 
-      const { id } = req.params;
+      const id = req.params.id as string;
       const parsedData = UpdateRatingDTO.safeParse(req.body);
       if (!parsedData.success) {
         return res.status(400).json({
@@ -141,7 +141,7 @@ export class RatingController {
           .json({ success: false, message: "Unauthorized" });
       }
 
-      const { id } = req.params;
+      const id = req.params.id as string;
       const result = await ratingService.deleteRating(id, userId);
       return res.status(200).json({
         success: true,
