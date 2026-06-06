@@ -23,7 +23,6 @@ router.get("/:id", laptopController.getById.bind(laptopController));
 router.post(
   "/",
   authorizedMiddleware,
-  uploads.array("images", 6),
   laptopController.create.bind(laptopController),
 );
 router.get(
@@ -41,6 +40,14 @@ router.delete(
   "/:id",
   authorizedMiddleware,
   laptopController.delete.bind(laptopController),
+);
+
+
+router.post(
+  "/upload",
+  authorizedMiddleware,
+  uploads.single("image"),
+  laptopController.uploadImage.bind(laptopController),
 );
 
 export default router;

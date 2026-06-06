@@ -20,8 +20,8 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use(bodyParser.json());
 
 app.use("/api/auth", authRoutes);
-app.use("/api/laptop", laptopRoutes);
-app.use("/api/wishlist", wishlistRoutes);
+app.use("/api/laptops", laptopRoutes);
+app.use("/api/wishlists", wishlistRoutes);
 app.use("/api/ratings", ratingRoutes);
 
 app.get("/", (req: Request, res: Response) => {

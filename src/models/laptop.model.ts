@@ -39,6 +39,11 @@ const LaptopSchema: Schema = new Schema<LaptopType>(
     sellerId: { type: String, required: true },
     yearOfManufacture: { type: Number },
     warrantyMonths: { type: Number, default: 0 },
+    location: {
+      lat: { type: Number },
+      lng: { type: Number },
+      address: { type: String },
+    },
     tags: [{ type: String }],
   },
   {

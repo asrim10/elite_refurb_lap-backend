@@ -176,4 +176,25 @@ export class LaptopController {
       });
     }
   }
+
+  async uploadImage(req: Request, res: Response) {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "No image file provided",
+        });
+      }
+      const url = `/uploads/${req.file.filename}`;
+      return res.status(200).json({
+        success: true,
+        data: { url },
+      });
+    } catch (error: any) {
+      return res.status(error.statusCode ?? 500).json({
+        success: false,
+        message: error.message || "Internal Server Error",
+      });
+    }
+  }
 }

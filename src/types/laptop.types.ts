@@ -29,6 +29,11 @@ export const LaptopSchema = z.object({
     .max(new Date().getFullYear())
     .optional(),
   warrantyMonths: z.number().min(0).default(0),
+  location: z.object({
+    lat: z.number(),
+    lng: z.number(),
+    address: z.string(),
+  }).optional(),
   tags: z.array(z.string()).default([]),
 });
 
