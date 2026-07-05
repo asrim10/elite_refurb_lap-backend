@@ -6,7 +6,7 @@ export const UserSchema = z.object({
   username: z.string().min(3).max(100),
   fullName: z.string().optional(),
   role: z.enum(["user", "admin"]).default("user"),
-  phoneNumber: z.string().max(30).optional(),
+  phoneNumber: z.string().max(30).nullish(),
   imageUrl: z.string().optional(),
 });
 
