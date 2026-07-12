@@ -152,10 +152,19 @@ export function initializeSocket(httpServer: HttpServer): Server {
           const populatedMessage = await MessageModel.findById(message._id)
             .populate("senderId", "fullName email imageUrl");
 
-          // Emit to all participants in the conversation room
-          io.to(`conversation:${data.conversationId}`).emit(
+          if (!populatedMessage) {
+            socket.emit("error", { message: "Failed to load saved message" });
+            return;
+          }
+
+          // Broadcast to all OTHER participants (exclude sender).
+          // The sender already has the optimistic message locally and
+          // doesn't need the server echo. This also prevents stale
+          // senderId issues when the socket reconnects after switching
+          // accounts.
+          socket.broadcast.to(`conversation:${data.conversationId}`).emit(
             "new:message",
-            populatedMessage,
+            populatedMessage.toObject(),
           );
 
           // Notify the other user's personal room
@@ -189,7 +198,7 @@ export function initializeSocket(httpServer: HttpServer): Server {
         await conversationRepository.resetUnread(conversationId, unreadField);
         await messageRepository.markAsRead(conversationId, userId);
 
-        io.to(`conversation:${conversationId}`).emit("conversation:read", {
+        io.to(`user:${userId}`).emit("conversation:read", {
           conversationId,
           readBy: userId,
         });
