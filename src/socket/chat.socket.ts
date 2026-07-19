@@ -5,10 +5,13 @@ import { JWT_SECRET } from "../config";
 import { UserRepository } from "../repositories/user.repositories";
 import { ConversationRepository, MessageRepository } from "../repositories/chat.repositories";
 import { MessageModel } from "../models/chat.model";
+import { NotificationService } from "../services/notification.service";
+import { emitNotification, emitUnreadCount } from "./notification.socket";
 
 const userRepository = new UserRepository();
 const conversationRepository = new ConversationRepository();
 const messageRepository = new MessageRepository();
+const notificationService = new NotificationService();
 
 interface AuthenticatedSocket extends Socket {
   userId?: string;
@@ -177,6 +180,37 @@ export function initializeSocket(httpServer: HttpServer): Server {
               lastMessageAt: new Date(),
               lastMessageSender: userId,
             });
+
+            // Create an in-app notification for the other user
+            try {
+              const sender = await userRepository.getUserByID(userId);
+              const senderName = sender?.fullName || sender?.email || "Someone";
+              const senderImage = sender?.imageUrl;
+
+              const notification = await notificationService.createNotification({
+                recipientId: otherUserId,
+                senderId: userId,
+                type: "message",
+                title: `New message from ${senderName}`,
+                body: data.content.length > 100
+                  ? data.content.substring(0, 100) + "..."
+                  : data.content,
+                metadata: {
+                  conversationId: data.conversationId,
+                  senderName,
+                  senderImage,
+                },
+              });
+
+              // Push notification in real-time (convert to plain object)
+              emitNotification(io, otherUserId, notification.toObject());
+
+              // Update unread count for the recipient
+              const unreadResult = await notificationService.getUnreadCount(otherUserId);
+              emitUnreadCount(io, otherUserId, unreadResult.count);
+            } catch (err) {
+              console.error("Failed to create notification:", err);
+            }
           }
         } catch (error: any) {
           socket.emit("error", { message: error.message || "Failed to send message" });
