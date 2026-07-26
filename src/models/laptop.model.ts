@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { LaptopType } from "../types/laptop.types";
 
-const LaptopSchema: Schema = new Schema<LaptopType>(
+const LaptopSchema: Schema = new Schema(
   {
     title: { type: String, required: true },
     brand: { type: String, required: true },
@@ -36,7 +36,11 @@ const LaptopSchema: Schema = new Schema<LaptopType>(
     batteryLife: { type: Number },
     weight: { type: Number },
     // Meta
-    sellerId: { type: String, required: true },
+    sellerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     yearOfManufacture: { type: Number },
     warrantyMonths: { type: Number, default: 0 },
     location: {
@@ -48,11 +52,24 @@ const LaptopSchema: Schema = new Schema<LaptopType>(
   },
   {
     timestamps: true,
+    toJSON: {
+      transform: function (doc: any, ret: Record<string, any>) {
+        if (ret.sellerId && typeof ret.sellerId === "object") {
+          const seller = ret.sellerId;
+          ret.sellerId = seller._id?.toString();
+          ret.sellerName = seller.fullName ?? null;
+          ret.sellerImage = seller.imageUrl ?? null;
+          ret.sellerPhone = seller.phoneNumber ?? null;
+        }
+        return ret;
+      },
+    },
   },
 );
 
-export interface ILaptop extends LaptopType, Document {
+export interface ILaptop extends Omit<LaptopType, "sellerId">, Document {
   _id: mongoose.Types.ObjectId;
+  sellerId: mongoose.Types.ObjectId | string;
   createdAt: Date;
   updatedAt: Date;
 }
