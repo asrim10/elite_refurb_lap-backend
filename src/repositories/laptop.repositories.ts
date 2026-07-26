@@ -84,7 +84,12 @@ export class LaptopRepository implements ILaptopRepository {
   }
 
   async getLaptopsBySeller(sellerId: string): Promise<ILaptop[]> {
-    return await LaptopModel.find({ sellerId })
+    // Use $expr with $toString to handle both ObjectId and string sellerId types
+    return await LaptopModel.find({
+      $expr: {
+        $eq: [{ $toString: "$sellerId" }, sellerId],
+      },
+    })
       .populate("sellerId", "fullName phoneNumber imageUrl")
       .sort({ createdAt: -1 });
   }
