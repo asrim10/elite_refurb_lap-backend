@@ -34,9 +34,6 @@ export class LaptopService {
   // Public - anyone can view a seller's listings by sellerId
   async getSellerListings(sellerId: string) {
     const laptops = await laptopRepository.getLaptopsBySeller(sellerId);
-    if (!laptops.length) {
-      throw new HttpError("No listings found for this seller", 404);
-    }
     return laptops;
   }
 
@@ -50,11 +47,12 @@ export class LaptopService {
     if (!laptop) {
       throw new HttpError("Laptop not found", 404);
     }
-    // sellerId may be a populated object after populate(), so convert to string
-    if (
-      laptop.sellerId.toString() !== requesterId &&
-      requesterRole !== "admin"
-    ) {
+    // sellerId may be a populated object after populate(), so extract _id
+    const actualSellerId =
+      typeof laptop.sellerId === "object" && laptop.sellerId !== null
+        ? (laptop.sellerId as any)._id?.toString()
+        : laptop.sellerId.toString();
+    if (actualSellerId !== requesterId && requesterRole !== "admin") {
       throw new HttpError("Unauthorized", 403);
     }
     const updated = await laptopRepository.updateLaptop(id, data as any);
@@ -66,11 +64,12 @@ export class LaptopService {
     if (!laptop) {
       throw new HttpError("Laptop not found", 404);
     }
-    // sellerId may be a populated object after populate(), so convert to string
-    if (
-      laptop.sellerId.toString() !== requesterId &&
-      requesterRole !== "admin"
-    ) {
+    // sellerId may be a populated object after populate(), so extract _id
+    const actualSellerId =
+      typeof laptop.sellerId === "object" && laptop.sellerId !== null
+        ? (laptop.sellerId as any)._id?.toString()
+        : laptop.sellerId.toString();
+    if (actualSellerId !== requesterId && requesterRole !== "admin") {
       throw new HttpError("Unauthorized", 403);
     }
     const deleted = await laptopRepository.deleteLaptop(id);

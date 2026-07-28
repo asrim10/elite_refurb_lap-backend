@@ -25,7 +25,7 @@ export class LaptopController {
           message: z.prettifyError(parsedData.error),
         });
       }
-      if (req.files && Array.isArray(req.files)) {
+      if (req.files && Array.isArray(req.files) && req.files.length > 0) {
         parsedData.data.images = req.files.map((f) => `/uploads/${f.filename}`);
       }
       const laptop = await laptopService.createLaptop(
@@ -132,8 +132,16 @@ export class LaptopController {
           message: z.prettifyError(parsedData.error),
         });
       }
-      if (req.files && Array.isArray(req.files)) {
+      // Only apply images from files if new files were uploaded
+      if (req.files && Array.isArray(req.files) && req.files.length > 0) {
         parsedData.data.images = req.files.map((f) => `/uploads/${f.filename}`);
+      }
+      // Strip fields Zod defaulted but weren't in the original body
+      // (prevents .default() from silently overwriting existing data on partial updates)
+      for (const key of Object.keys(parsedData.data)) {
+        if (!(key in req.body)) {
+          delete (parsedData.data as any)[key];
+        }
       }
       const updated = await laptopService.updateLaptop(
         req.params.id as string,

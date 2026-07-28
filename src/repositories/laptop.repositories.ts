@@ -44,6 +44,12 @@ export class LaptopRepository implements ILaptopRepository {
 
     const filter: Record<string, any> = {};
 
+    // Default marketplace queries to only show available listings
+    // unless an explicit status filter is provided
+    if (!status) {
+      filter.status = "available";
+    }
+
     if (search) {
       filter.$or = [
         { title: { $regex: search, $options: "i" } },
